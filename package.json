@@ -1,0 +1,30 @@
+{
+  "name": "CI_Lamp",
+  "version": "0.1.0",
+  "description": "This is a project build CI monitor lamp with Arduino and node.js",
+  "main": "app.coffee",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/timnew/ArduinoCiLamp.git"
+  },
+  "keywords": [
+    "CI",
+    "Arduino",
+    "Lamp",
+    "ContinuesIntegration",
+    "Monitor",
+    "Jenkins",
+    "Bamboo",
+    "Go",
+    "Cruise",
+    "CuriseControl",
+    "Travis"
+  ],
+  "author": "TimNew",
+  "license": "MIT",
+  "dependencies": {
+    "serialport": ""
+  }
+}
