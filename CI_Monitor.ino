@@ -1,7 +1,7 @@
 #include "RGB_Led.h"
 
 byte busyLed = 2;
-RGBLed led(3, 5, 6);
+RGBLed led(11, 10, 9);
 
 void setup() {
   led.setColor(0);
