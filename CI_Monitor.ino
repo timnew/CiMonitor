@@ -10,7 +10,7 @@ void setup() {
   
   pinMode(busyLed, OUTPUT);
   
-  Serial.begin(57600); 
+  Serial.begin(9600); 
   Serial.println("Color: ");
   
   for(byte i = 0; i < 8; i++) {

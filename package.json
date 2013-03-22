@@ -25,6 +25,6 @@
   "author": "TimNew",
   "license": "MIT",
   "dependencies": {
-    "serialport": ""
+    "serialport": "git://github.com/voodootikigod/node-serialport.git"
   }
 }
