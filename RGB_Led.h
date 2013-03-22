@@ -3,21 +3,16 @@
 
 #include "Arduino.h"
 
-enum RGB {
-  Black = 0x00,
-  Red = 0x04,
-  Green = 0x02,
-  Blue = 0x01
-};
+#define ARGB long
 
 class RGBLed {
   public:
   RGBLed(byte redPin, byte greenPin, byte bluePin);
-  void setColor(RGB newValue);
-  RGB getColor();
+  void setColor(ARGB newValue);
+  ARGB getColor();
   
   private:
-  RGB current;
+  ARGB current;
   byte pins[3];
 };
 

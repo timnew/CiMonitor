@@ -1,12 +1,6 @@
 _ = require('lodash')
 serialport = require('serialport')
 
-  # productId: '0x0001',
-  #   vendorId: '0x2341',
-  #   locationId: '0xfd110000 / 3',
-  #   manufacturer: 'Arduino (www.arduino.cc)',
-  #   serialNumber: '64131383331351700000',
-  #   comName: '/dev/cu.usbserial-64131383331351700000' 
 serialport.list (err, results) ->
   console.error err if err?
   
