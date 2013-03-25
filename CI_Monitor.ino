@@ -35,7 +35,7 @@ void setup() {
   setupBlueTooth();
   Serial.begin(9600); 
 
-  Serial.println("CI Lamp Ready");
+  Serial.println("CT+Ready");
 }
 
 void loop() {

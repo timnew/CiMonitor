@@ -2,20 +2,33 @@ _ = require('lodash')
 serialport = require('serialport')
 colorConvert = require('color-convert')
 
-class LedLamp
+EventEmitter = require('events').EventEmitter
+
+class LedLamp extends EventEmitter
   constructor: (portName) ->
     @port = new serialport.SerialPort portName
 
-    @port.on 'data', @onData
+    parseData = (data) =>
+      if data.length >= 2 and data[0..1] == 'AT'
+        @emit 'command', data
+      else if data.trim() == 'CT+Ready'
+        @emit 'ready', this
+      else
+        @emit 'data', data
 
-    @port.on 'error', @onError
+    buffer = ''      
+    @port.on 'data', (data) ->
+      buffer += data.toString('ascii')
+      if buffer[buffer.length - 2] == '\r' and buffer[buffer.length - 1] == '\n'
+        parseData(buffer)
+        buffer = ''
 
-  onData: (data) =>
-    process.stdout.write data
-    
-  onError: (error) =>
-    process.stderr.write data
+    @port.on 'error', (error) =>
+      @emit 'error', error
   
+  ready: (callback) ->
+    @once 'ready', callback
+    
   close: ->
     @port.close()
 
