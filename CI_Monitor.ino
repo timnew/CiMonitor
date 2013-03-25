@@ -1,44 +1,51 @@
 #include "RGB_Led.h"
 
-byte busyLed = 2;
+#define AT 2
+
 RGBLed led(11, 10, 9);
 
+void setupBlueTooth() {
+   pinMode(AT, OUTPUT);
+   
+   digitalWrite(AT, HIGH);
+  
+   Serial.begin(9600); 
+   delay(100);
+  
+   Serial.println("AT");
+   delay(100);
+  
+   Serial.println("AT+NAME=OPENJUMPER-Bluetooth"); 
+   delay(100);
+  
+   Serial.println("AT+ROLE=0"); 
+   delay(100);
+  
+   Serial.println("AT+PSWD=1234"); 
+   delay(100);
+  
+   Serial.println("AT+UART=9600,0,0"); 
+   delay(100);
+  
+   digitalWrite(AT, LOW);
+ }
+
 void setup() {
-  led.setColor(0);
-  
-  pinMode(busyLed, OUTPUT);
-  
+  led.setColor(0, 0, 0);
+  setupBlueTooth();
   Serial.begin(9600); 
-  Serial.println("Color: A,R,G,B");
-  
-  for(byte i = 0; i < 8; i++) {
-    digitalWrite(busyLed, (i % 2 == 0 ? HIGH: LOW));
-    delay(100);
-  }
+
+  Serial.println("CI Lamp Ready");
 }
 
 void loop() {
   if(Serial.available()) {
-    digitalWrite(busyLed, HIGH);
+    char values[3];   
+    Serial.readBytes(values, 3);
 
-    Serial.print("Read Color: #");    
+    led.setColor((byte*)values);
     
-    char values[4];   
-    for(byte i = 0; i < 4 ; i++) {
-      values[i] = (byte) Serial.parseInt();
-      Serial.print(values[i], HEX);
-      if(i < 3) {
-        Serial.find(",");
-      }
-    }
-    
-    long longValue = *((long*) values);
-    led.setColor(longValue);
-    
-    Serial.println(led.getColor(), HEX);
-    Serial.println("Color: A,R,G,B");
+    Serial.println(led.getColorValue(), HEX);
   }
-  delay(10);
-  digitalWrite(busyLed, LOW);
 }
 
