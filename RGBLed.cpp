@@ -1,4 +1,4 @@
-#include "RGB_Led.h"
+#include "RGBLed.h"
 
 RGBLed::RGBLed(byte redPin, byte greenPin, byte bluePin) {
   pins[0] = redPin;  

@@ -1,5 +1,5 @@
-#ifndef _RGB_Led_h
-#define _RGB_Led_h
+#ifndef _RGBLed_H_
+#define _RGBLed_H_
 
 #include "Arduino.h"
 
