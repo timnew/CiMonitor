@@ -22,40 +22,68 @@ void BlueToothSerial::flush() {
 
 BlueToothSerial::BlueToothSerial(byte ATPin, Stream* serialPort) {
   atPin = ATPin;
+  pinMode(atPin, OUTPUT);
   stream = serialPort;
+  
+  while(stream->available()) {
+    stream->read();
+  }
 }
 
-void BlueToothSerial::setup(int baund, char* name, char* secretPin) {
+void BlueToothSerial::beginSetup(byte retryTimes = 0) {
   digitalWrite(atPin, HIGH);
-    
-   stream->println("AT");
-   delay(100);
-  
-   stream->print("AT+NAME=");
-   stream->println(name); 
-   delay(100);
-  
-   stream->print("AT+ROLE="); 
-   stream->println("0");
-   delay(100);
-  
-   stream->print("AT+PSWD="); 
-   stream->println(secretPin);
-   delay(100);
-  
-   stream->print("AT+UART=");
-   stream->print(baund, DEC);
-   stream->println(",0,0"); 
-   delay(100);
-  
-   digitalWrite(atPin, LOW);
+  this->retry = retryTimes;
+  setupResult = "\r\n== BlueTooth Setup ==\r\n";
 }
 
-void BlueToothSerial::sendCommand(char* command) {
-  digitalWrite(atPin, HIGH);
-  stream->println(command);
-  delay(100);
+String BlueToothSerial::endSetup() {
   digitalWrite(atPin, LOW);
+  return setupResult;
 }
+
+boolean BlueToothSerial::setupEcho() { return sendCommand("AT"); }
+boolean BlueToothSerial::setupBaund(int baund) { return sendCommand("AT+UART=" + String(baund, DEC) + ",0,0"); }
+boolean BlueToothSerial::setupRole(byte role) { return sendCommand("AT+ROLE=" + String(role, DEC)); }
+boolean BlueToothSerial::setupName(String name) { return sendCommand("AT+NAME=" + String(name)); }
+boolean BlueToothSerial::setupSecret(String secretPin) { return sendCommand("AT+PSWD=" + String(secretPin)); }
+boolean BlueToothSerial::setupRemoveParis() { return sendCommand("AT+RMAAD"); }
+
+boolean BlueToothSerial::sendCommand(char* command) {
+  return sendCommand(String(command));
+}
+
+boolean BlueToothSerial::sendCommand(String command) {
+  byte times;
+  
+  for(times = 0; times < retry; times ++) {
+    setupResult += "Sent: ";
+    setupResult += command;
+    setupResult += "\r\n";
+    
+    stream->println(command); 
+    stream->flush();
+   
+    String result = stream->readStringUntil('\n');
+    
+    setupResult += "Result: ";
+    setupResult += result;
+    setupResult += "\r\n";
+    result.trim();
+    if( result == "OK") {
+      break;
+    }
+  }
+  
+  if(times == retry) {
+    setupResult += "ERROR: Command Failed\r\n\r\n";
+    return false;
+  }
+  else {
+    setupResult += "SUCCEEDED\r\n\r\n";
+    return true;
+  }
+}
+
+
 
 

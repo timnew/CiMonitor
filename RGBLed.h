@@ -14,8 +14,11 @@ class RGBLed {
   byte* getColor();
   ColorValue getColorValue();
   
+  void blink(int duration, int times, ColorValue value);
+  
   private:
-  void refresh();
+  void updateLed(byte* rgb);
+  void updateLed();
   byte pins[3];
   byte currentColor[3];
   byte __protector; // Used for over boundary protection;

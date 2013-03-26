@@ -18,7 +18,7 @@ void RGBLed::setColor(byte r, byte g, byte b) {
   currentColor[1] = g;
   currentColor[2] = b;  
 
-  refresh();
+  updateLed();
 }
 
 void RGBLed::setColor(byte* rgb) {
@@ -29,13 +29,35 @@ void RGBLed::setColor(ColorValue value) {
   setColor((byte*)&value);
 }
 
-void RGBLed::refresh() {
+void RGBLed::updateLed(byte* rgb) {
   byte i;
   byte* pin = pins;
-  byte* color = currentColor;
+  byte* color = rgb;
   for(i = 0; i < 3; i++, pin++, color++) {
     analogWrite(*pin, 255 - *color);
   }
+}
+
+void RGBLed::updateLed() {
+  updateLed(currentColor);
+}
+
+
+void RGBLed::blink(int duration, int times, ColorValue value) {
+  ColorValue black = 0;
+  int halfDuration = duration >> 1;
+  int doubleTimes = times << 2;
+  
+  for(int i = 0 ; i < doubleTimes; i++ ) {
+    if(i & 0x01) {
+      updateLed((byte*)&value);
+    }
+    else {
+      updateLed((byte*)&black); 
+    }
+    delay(halfDuration);
+  }
+  updateLed();
 }
  
 byte* RGBLed::getColor() {
