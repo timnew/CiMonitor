@@ -15,7 +15,7 @@ options = require('optimist')
       alias: 'port-name'
       default: null
       type: 'string'
-      description: 'Then name of the port connected to Arduio board'
+      description: 'Then name of the port connected to Arduio board, leave empty for auto-detect'
     .demand(3)  
     .argv
 
@@ -36,9 +36,11 @@ controlLed = (portName) ->
         console.error "Invalid Color Profile: #{colorProfile}"
         return process.exit(1)
 
-    console.log "#{colorProfile.toUpperCase()}: #{util.inspect(components)}"
+    led.once 'colorChanged', (ledStatus) ->
+      console.log "#{colorProfile.toUpperCase()}: #{util.inspect(ledStatus)}"      
+      process.exit(0)
+      
     led.setColorRGB rgb
-    process.exit(0)
   
 if options.p 
   controlLed(options.p)
