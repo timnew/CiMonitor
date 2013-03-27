@@ -43,12 +43,12 @@ void RGBLed::updateLed() {
 }
 
 
-void RGBLed::blink(int duration, int times, ColorValue value) {
+void RGBLed::blink(ColorValue value, int times, int duration) {
   ColorValue black = 0;
   int halfDuration = duration >> 1;
   int doubleTimes = times << 2;
   
-  for(int i = 0 ; i < doubleTimes; i++ ) {
+  for(int i = 0 ; !times || i < doubleTimes; i++ ) {
     if(i & 0x01) {
       updateLed((byte*)&value);
     }
@@ -59,7 +59,12 @@ void RGBLed::blink(int duration, int times, ColorValue value) {
   }
   updateLed();
 }
- 
+
+void RGBLed::last(ColorValue value, int duration) {
+  updateLed((byte*)&value);
+  delay(duration);
+}
+
 byte* RGBLed::getColor() {
   return currentColor;
 }

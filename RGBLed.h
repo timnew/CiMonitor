@@ -14,7 +14,8 @@ class RGBLed {
   byte* getColor();
   ColorValue getColorValue();
   
-  void blink(int duration, int times, ColorValue value);
+  void blink(ColorValue value, int times = 4, int duration = 100);
+  void last(ColorValue value, int duration = 1000);
   
   private:
   void updateLed(byte* rgb);
