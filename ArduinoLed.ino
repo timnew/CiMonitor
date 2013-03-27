@@ -8,17 +8,25 @@ BlueToothSerial BTSerial = BlueToothSerial(2, &Serial);
 
 void setup() {
   led.setColor(0, 0, 0);
-  led.blink(100, 2, 0xFFFFFFL);
+  led.blink(0xFFFFFFL, 2);
   Serial.begin(9600);
+  
+  bool succeeded = true;
   
 #if BLUETOOTH  
   BTSerial.beginSetup(3);
-  
-  BTSerial.setupEcho();
-  BTSerial.setupBaund(9600);
-  BTSerial.setupRole(0);
-  BTSerial.setupName("TimNew-CI-Lamp");
-  BTSerial.setupSecret("4884");
+ 
+  if(BTSerial.setupEcho(6)) { // Bluetooth board if found
+
+    led.blink(0xFF0000L, 3);
+    succeeded &= BTSerial.setupBaund(9600);
+    succeeded &= BTSerial.setupRole(0);
+    succeeded &= BTSerial.setupName("TimNew-CI-Lamp");
+    succeeded &= BTSerial.setupSecret("4884");
+  }
+  else {
+    led.last(0x00FFFF);
+  }
   
   String result = BTSerial.endSetup();
   
@@ -26,7 +34,15 @@ void setup() {
   
 #endif
 
-  led.blink(100, 4, 0xFFFFFFL);
+  if(succeeded) {
+    led.blink(0x00FF00L, 4);
+  }
+  else {
+    led.blink(0x0000FFL, 4);
+  }
+  
+  
+  
   
   BTSerial.println("LED+Ready");
 }
