@@ -6,13 +6,13 @@ util = require('util')
 
 options = require('optimist')
     .usage('Set the LED light.\nUsage: LedControl [options] r/h g/s b/v/l\n$0')
-    .options 'c',
-      alias: 'color-profile'
+    .options 'P',
+      alias: 'profile'
       default: 'rgb'
       type: 'string'
-      description: 'Color profile: RGB, HSV, HSL'
+      description: 'Color profile: RGB, HSV, HSL...'
     .options 'p'
-      alias: 'port-name'
+      alias: 'port'
       default: null
       type: 'string'
       description: 'Then name of the port connected to Arduio board, leave empty for auto-detect'
@@ -23,11 +23,21 @@ components = _.map options._, (num) ->
   parseInt num, 10
 
 controlLed = (portName) ->
-  new LedLamp(portName).ready (led) ->
-    console.log "LED is connected successfully"
-    
-    colorProfile = options.c.toLowerCase()
-    switch colorProfile 
+  new LedLamp(portName).ready 
+ 
+LedLamp.findOrSetByName options.port, (err, led) ->
+  return console.error err if err?
+  
+  console.log "Connect to #{led.portName}..."
+
+  colorProfile = options.profile
+
+  led.once 'colorChanged', (ledStatus) ->
+    console.log "#{colorProfile.toUpperCase()}: #{util.inspect(ledStatus)}"      
+    process.exit(0)
+  
+  led.ready ->  
+    switch colorProfile.toLowerCase() 
       when 'rgb' 
         rgb = components
       when 'hsv', 'hsl'
@@ -36,20 +46,4 @@ controlLed = (portName) ->
         console.error "Invalid Color Profile: #{colorProfile}"
         return process.exit(1)
 
-    led.once 'colorChanged', (ledStatus) ->
-      console.log "#{colorProfile.toUpperCase()}: #{util.inspect(ledStatus)}"      
-      process.exit(0)
-      
     led.setColorRGB rgb
-  
-if options.p 
-  controlLed(options.p)
-else
-  LedLamp.findUsbPort (err, port) ->
-    if err?
-      console.error err
-      return process.exit(1)
-  
-    console.log "Found Arduino at #{port.comName}"
-    controlLed(port.comName)
-

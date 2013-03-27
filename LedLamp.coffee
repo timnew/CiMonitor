@@ -5,8 +5,8 @@ colorConvert = require('color-convert')
 EventEmitter = require('events').EventEmitter
 
 class LedLamp extends EventEmitter
-  constructor: (portName) ->
-    @port = new serialport.SerialPort portName
+  constructor: (@portName) ->
+    @port = new serialport.SerialPort @portName
 
     parseData = (data) =>
       @emit 'data', data
@@ -80,6 +80,24 @@ ClassMethods =
       return callback("No Arudio Found") unless port?  
 
       callback(null, port)
+      
+  findOrSetByName: (portName, callback) ->
+    if portName?
+      try
+        led = new LedLamp(portName)
+        callback(null, led)
+      catch ex
+        callback(ex)
+    else
+      LedLamp.findUsbPort (err, port) ->
+        if err?
+          return callback(err)
+          
+        try
+          led = new LedLamp(port.comName)
+          callback(null, led)
+        catch ex
+          callback(ex)
   
 _.extend LedLamp, ClassMethods  
   

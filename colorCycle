@@ -5,7 +5,7 @@ LedLamp = require('./LedLamp')
 options = require('optimist')
     .usage('Cycle LED light color in Hue.\nUsage: colorCycle [options]\n$0')
     .options 'p'
-      alias: 'port-name'
+      alias: 'port'
       default: null
       type: 'string'
       description: 'Then name of the port connected to Arduio board, leave empty for auto-detect'
@@ -16,13 +16,14 @@ options = require('optimist')
       description: 'The step of color change, increase to reduce the traffic over control serial port'
     .argv
     
-step = parseInt(options.s, 10);
+step = parseInt(options.step, 10);
 stepDelay = step * 10;
 
-run = (portName) ->
-  console.log "Opening port #{portName}..."
-  led = new LedLamp(portName)
-
+LedLamp.findOrSetByName options.port, (err, led) ->
+  return console.error err if err?
+    
+  console.log "Opening port #{led.portName}..."
+  
   led.on 'unknownData', (data) ->
     console.log "> #{data}"
     
@@ -41,16 +42,4 @@ run = (portName) ->
        led.setColorHSV(h, s, v)
 
      setInterval updateColor, stepDelay
-
-if options.p
-  run options.p
-else
-  LedLamp.findUsbPort (err, port) ->
-    if err?
-      console.error err
-      return process.exit(1)
-  
-    console.log "Led is found on port #{port.comName}"
-  
-    run(port.comName)
  
