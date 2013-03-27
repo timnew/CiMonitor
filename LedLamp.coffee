@@ -67,6 +67,10 @@ class LedLamp extends EventEmitter
     rgb = colorConvert['hsv']['rgb']([h, s, v])
     @setColorRGB rgb
     
+  setColorKeyword: (keyword) ->
+    rgb = colorConvert['keyword']['rgb'](keyword)
+    @setColorRGB rgb
+    
 ClassMethods = 
   findUsbPort: (callback) ->
     serialport.list (err, results) ->
