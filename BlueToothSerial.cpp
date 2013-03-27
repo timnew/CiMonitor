@@ -30,60 +30,82 @@ BlueToothSerial::BlueToothSerial(byte ATPin, Stream* serialPort) {
   }
 }
 
-void BlueToothSerial::beginSetup(byte retryTimes = 0) {
+void BlueToothSerial::beginSetup(sbyte retryTimes) {
   digitalWrite(atPin, HIGH);
   this->retry = retryTimes;
-  setupResult = "\r\n== BlueTooth Setup ==\r\n";
+  setupResult = "\r\n== BlueTooth Setup ==\r\n\r\n";
 }
 
+void BlueToothSerial::setupPrint(String output) { setupResult += output; }
+void BlueToothSerial::setupPrintln() { setupResult += "\r\n"; }
+void BlueToothSerial::setupPrintln(String output) { 
+  setupPrint(output);
+  setupPrintln(); 
+}
+void BlueToothSerial::setupPrintln(String label, String value) {
+  setupPrint(label);
+  setupPrint(": ");
+  setupPrint(value);
+  setupPrintln();
+}
+void BlueToothSerial::setupPrintln(String label, int index, String value) {
+  setupPrint(label);
+  setupPrint("[");
+  setupPrint(String(index, DEC));
+  setupPrint("]: ");
+  setupPrint(value);
+  setupPrintln();
+}
+
+
 String BlueToothSerial::endSetup() {
+  setupPrint("\r\n\r\n== BlueTooth Setup End ==\r\n");
   digitalWrite(atPin, LOW);
   return setupResult;
 }
 
-boolean BlueToothSerial::setupEcho() { return sendCommand("AT"); }
-boolean BlueToothSerial::setupBaund(int baund) { return sendCommand("AT+UART=" + String(baund, DEC) + ",0,0"); }
-boolean BlueToothSerial::setupRole(byte role) { return sendCommand("AT+ROLE=" + String(role, DEC)); }
-boolean BlueToothSerial::setupName(String name) { return sendCommand("AT+NAME=" + String(name)); }
-boolean BlueToothSerial::setupSecret(String secretPin) { return sendCommand("AT+PSWD=" + String(secretPin)); }
-boolean BlueToothSerial::setupRemoveParis() { return sendCommand("AT+RMAAD"); }
+boolean BlueToothSerial::setupEcho(sbyte retryTimes) { return sendCommand("AT", retryTimes); }
+boolean BlueToothSerial::setupBaund(int baund, sbyte retryTimes) { return sendCommand("AT+UART=" + String(baund, DEC) + ",0,0", retryTimes); }
+boolean BlueToothSerial::setupRole(byte role, sbyte retryTimes) { return sendCommand("AT+ROLE=" + String(role, DEC), retryTimes); }
+boolean BlueToothSerial::setupName(String name, sbyte retryTimes) { return sendCommand("AT+NAME=" + String(name), retryTimes); }
+boolean BlueToothSerial::setupSecret(String secretPin, sbyte retryTimes) { return sendCommand("AT+PSWD=" + String(secretPin), retryTimes); }
+boolean BlueToothSerial::setupRemoveParis(sbyte retryTimes) { return sendCommand("AT+RMAAD", retryTimes); }
 
-boolean BlueToothSerial::sendCommand(char* command) {
-  return sendCommand(String(command));
+boolean BlueToothSerial::sendCommand(char* command, sbyte retryTimes) {
+  return sendCommand(String(command), retryTimes);
 }
 
-boolean BlueToothSerial::sendCommand(String command) {
+boolean BlueToothSerial::sendCommand(String command, sbyte retryTimes) {
   byte times;
+  if(retryTimes == -1)
+    retryTimes = retry;
+
+    setupPrintln("Command", command);
   
-  for(times = 0; times < retry; times ++) {
-    setupResult += "Sent: ";
-    setupResult += command;
-    setupResult += "\r\n";
-    
+  for(times = 0; times < retryTimes; times ++) {    
     stream->println(command); 
     stream->flush();
    
     String result = stream->readStringUntil('\n');
-    
-    setupResult += "Result: ";
-    setupResult += result;
-    setupResult += "\r\n";
+    if(result=="")
+      result = "<TimeOut>";
+      
+    setupPrintln("Result", times, result);
     result.trim();
     if( result == "OK") {
       break;
     }
   }
   
-  if(times == retry) {
-    setupResult += "ERROR: Command Failed\r\n\r\n";
+  if(times == retryTimes) {
+    setupPrint("Result: Failed\r\n\r\n");
     return false;
   }
   else {
-    setupResult += "SUCCEEDED\r\n\r\n";
+    setupPrint("Result: Succeeded\r\n\r\n");
     return true;
   }
 }
-
 
 
 
