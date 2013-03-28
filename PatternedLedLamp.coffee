@@ -10,7 +10,7 @@ class PatternedLedLamp extends LedLamp
     if typeof(pattern) is 'function'
       pattern = new pattern(this, options)
       
-    clearPattern if @currentPattern?
+    @clearPattern() if @currentPattern?
     @currentPattern = pattern
     pattern.start()
   

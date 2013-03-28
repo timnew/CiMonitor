@@ -1,7 +1,8 @@
 #!/usr/bin/env coffee
 
 request = require('superagent')
-LedLamp = require('./LedLamp')
+LedLamp = require('./PatternedLedLamp')
+patterns = require('./LedPatterns')
 
 options = require('optimist')
   .usage('Cycle LED light color in Hue.\nUsage: ciLamp [options] <url>\n$0')
@@ -31,25 +32,6 @@ url = options._[0] ? 'https://jenkins.fishsource.org/job/JS%20Spec/api/json'
 
 options.interval = parseInt(options.interval, 10);
 
-
-parseColor = (color) ->
-  # https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/model/BallColor.java#L56
-  switch color
-    when 'red', 'red_anime'
-      'red'
-    when 'yellow', 'yellow_anime'
-      'yellow'
-    when 'blue', 'blue_anime'
-      'blue'
-    when 'grey', 'grey_anime'
-      'grey'
-    when 'disabled', 'disabled_anime'
-      'grey'
-    when 'aborted', 'aborted_anime'
-      'grey'
-    when 'notbuilt', 'notbuilt_anime'
-      'grey'
-      
 LedLamp.findOrSetByName options.port, (err, led) ->
   return console.error err if err?
   
@@ -57,15 +39,48 @@ LedLamp.findOrSetByName options.port, (err, led) ->
   led.ready ->
     console.log "LED Connected"
     
+    lastState = null
+
     update = ->
       request
         .get(url)
         .auth(options.user, options.password)
         .end (err, res) ->
           return if err?
-          console.log res.body.color
-          led.setColorKeyword parseColor(res.body.color)
-      
+
+          currentState = res.body.color
+          
+          return if currentState == lastState
+          
+          lastState = currentState
+          
+          process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+          process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+          
+          process.stdout.write "Status: "
+          
+          switch currentState
+            when 'red_anime', 'yellow_anime', 'blue_anime', 'grey_anime', 'disabled_anime', 'aborted_anime', 'notbuilt_anime'
+              led.applyPattern patterns.HueMarquee, {}
+              process.stdout.write "In progress..."
+            when 'red'
+              led.applyPattern patterns.Constant, 
+                color: [255, 0, 0]
+              process.stdout.write "Failed"
+            when 'yellow'
+              led.applyPattern patterns.Constant,
+                color: [128, 0, 128]
+              process.stdout.write "Unstable"
+            when 'blue'
+              led.applyPattern patterns.Constant,
+                color: [0, 255, 0]
+              process.stdout.write "Passed"
+            when 'grey', 'disabled', 'aborted',' notbuilt'
+              led.applyPattern patterns.Blink, 
+                color: [64, 64, 64]
+                duration: 100
+              process.stdout.write "No Result"  
+
     setInterval update, options.interval 
 
 
