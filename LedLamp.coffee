@@ -59,17 +59,20 @@ class LedLamp extends EventEmitter
     @sendCommand "LED+Color"
     @sendRaw rgb
   
-  setColorHSL: (h, s, l) ->
-    rgb = colorConvert['hsl']['rgb']([h, s, l])
+  setColorHSL: (hsl) ->
+    rgb = colorConvert['hsl']['rgb'](hsl)
     @setColorRGB rgb
     
-  setColorHSV: (h, s, v) ->
-    rgb = colorConvert['hsv']['rgb']([h, s, v])
+  setColorHSV: (hsv) ->
+    rgb = colorConvert['hsv']['rgb'](hsv)
     @setColorRGB rgb
     
   setColorKeyword: (keyword) ->
     rgb = colorConvert['keyword']['rgb'](keyword)
     @setColorRGB rgb
+  
+  turnOff: ->
+    @setColorRGB [0, 0, 0]
     
 ClassMethods = 
   findUsbPort: (callback) ->
