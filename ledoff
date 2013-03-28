@@ -1,0 +1,38 @@
+#!/usr/bin/env coffee
+_ = require('lodash')
+LedLamp = require('./LedLamp')
+colorConvert = require('color-convert')
+util = require('util')
+
+options = require('optimist')
+    .usage('Turn off the LED.\nUsage: ledoff [options]\n$0')
+    .options 'p'
+      alias: 'port'
+      default: null
+      type: 'string'
+      description: 'The name of the port connected to Arduio board, leave empty for auto-detect'
+    .argv
+
+components = _.map options._, (num) ->
+  parseInt num, 10
+
+controlLed = (portName) ->
+  new LedLamp(portName).ready 
+ 
+LedLamp.findOrSetByName options.port, (err, led) ->
+  return console.error err if err?
+  
+  console.log "Connect to #{led.portName}..."
+
+  colorProfile = options.profile
+
+  led.once 'colorChanged', (ledStatus) ->
+    if _.all ledStatus, ((n) -> n == 0)
+      console.log "Led turned off"      
+      process.exit(0)
+    else
+      console.log "Error: LED status #{util.inspect(ledStatus)}"
+      process.exit(1)
+  
+  led.ready ->  
+    led.turnOff()
