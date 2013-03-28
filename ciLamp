@@ -3,9 +3,21 @@
 request = require('superagent')
 LedLamp = require('./PatternedLedLamp')
 patterns = require('./LedPatterns')
+url = require('url')
+fs = require('fs')
 
 options = require('optimist')
   .usage('Cycle LED light color in Hue.\nUsage: ciLamp [options] <url>\n$0')
+  .options 's'
+    alias: 'server'
+    demand: null
+    type: 'string'
+    description: 'The url of CI server, e.g. https://jenkins.jenkins-ci.org'
+  .options 'j'
+    alias: 'job'
+    demand: null
+    type: 'string'
+    description: 'The job to be monitored'
   .options 'p'
     alias: 'port'
     default: null
@@ -27,8 +39,11 @@ options = require('optimist')
     type: 'string'
     description: 'Password to log into CI server'
   .argv
+  
+if options._.length > 0
+  options = JSON.parse(fs.readFileSync options._[0], 'utf8')
 
-url = options._[0] ? 'https://jenkins.fishsource.org/job/JS%20Spec/api/json'
+targetUrl = url.resolve options.server, "job/#{encodeURIComponent(options.job)}/api/json"
 
 options.interval = parseInt(options.interval, 10);
 
@@ -43,7 +58,7 @@ LedLamp.findOrSetByName options.port, (err, led) ->
 
     update = ->
       request
-        .get(url)
+        .get(targetUrl)
         .auth(options.user, options.password)
         .end (err, res) ->
           return if err?
