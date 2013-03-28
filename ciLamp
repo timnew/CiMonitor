@@ -93,7 +93,8 @@ LedLamp.findOrSetByName options.port, (err, led) ->
             when 'grey', 'disabled', 'aborted',' notbuilt'
               led.applyPattern patterns.Blink, 
                 color: [64, 64, 64]
-                duration: 100
+                duration: 2000
+                portion: 0.7
               process.stdout.write "No Result"  
 
     setInterval update, options.interval 

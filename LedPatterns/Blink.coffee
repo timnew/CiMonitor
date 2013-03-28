@@ -6,7 +6,7 @@ class Blink
     portion = options.portion ? .5
 
     @onDuration = duration * portion
-    @offDuration = duration - onDuration
+    @offDuration = duration - @onDuration
 
   turnOn: =>
     @led.setColorRGB(@color)
@@ -14,7 +14,7 @@ class Blink
     
   turnOff: =>
     @led.setColorRGB([0, 0, 0])
-    @token = setTImeout @turnOn, @offDuration
+    @token = setTimeout @turnOn, @offDuration
 
   start: ->
     @stop() if @token?
