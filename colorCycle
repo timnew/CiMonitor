@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 
-LedLamp = require('./LedLamp')
+LedLamp = require('./PatternedLedLamp')
+HueMarquee = require('./LedPatterns/HueMarquee')
 
 options = require('optimist')
     .usage('Cycle LED light color in Hue.\nUsage: colorCycle [options]\n$0')
@@ -15,9 +16,12 @@ options = require('optimist')
       type: 'string'
       description: 'The step of color change, increase to reduce the traffic over control serial port'
     .argv
-    
-step = parseInt(options.step, 10);
-stepDelay = step * 10;
+
+marqueeOptions = 
+  hue: 0
+  saturation: 100    
+  value: 100
+  step: parseInt(options.step, 10)
 
 LedLamp.findOrSetByName options.port, (err, led) ->
   return console.error err if err?
@@ -29,17 +33,10 @@ LedLamp.findOrSetByName options.port, (err, led) ->
     
   led.ready (led) ->
      console.log "LED is Ready"
-     h = 0;
-     s = 100;
-     v = 100;
-
+     
      led.on 'colorChanged', (ledStatus) ->
        process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
        process.stdout.write "Color(RGB): [#{ledStatus.join(',')}]"
 
-     updateColor = ->
-       h = (h + step) % 360
-       led.setColorHSV(h, s, v)
-
-     setInterval updateColor, stepDelay
+     led.applyPattern HueMarquee, marqueeOptions
  
