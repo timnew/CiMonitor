@@ -3,24 +3,24 @@
 request = require('superagent')
 LedLamp = require('./PatternedLedLamp')
 patterns = require('./LedPatterns')
-url = require('url')
 fs = require('fs')
 path = require('path')
 _ = require('lodash')
+xml2js = require('xml2js')
 
 argv = require('optimist')
   .usage('Cycle LED light color in Hue.\nUsage: ciLamp [options] <url>\n$0')
-  .options 's'
-    alias: 'server'
-    demand: null
+  .options 'u'
+    alias: 'url'
+    default: null
     type: 'string'
-    description: 'The url of CI server, e.g. https://jenkins.jenkins-ci.org'
-  .options 'j'
-    alias: 'job'
-    demand: null
-    type: 'string'
-    description: 'The job to be monitored'
+    description: 'The url of cctray feed, e.g. https://jenkins.jenkins-ci.org/cc.xml'
   .options 'p'
+    alias: 'project'
+    default: null
+    type: 'string'
+    description: 'The name of the project need to monitored'
+  .options 'a'
     alias: 'port'
     default: null
     type: 'string'
@@ -55,9 +55,17 @@ options.interval = parseInt(options.interval ? 1000, 10);
 
 console.log options
 
-targetUrl = url.resolve options.server, "job/#{encodeURIComponent(options.job)}/api/json"
-
 options.interval = parseInt(options.interval, 10);
+
+parseProjectStatus = (feed, projectName) ->
+  projects = feed.Projects.Project
+  project = _.find projects, (p) ->
+    p.$.name == projectName
+  
+  if project.$.activity == 'Building'
+    return 'Building'
+  else
+    return project.$.lastBuildStatus
 
 LedLamp.findOrSetByName options.port, (err, led) ->
   return console.error err if err?
@@ -70,44 +78,50 @@ LedLamp.findOrSetByName options.port, (err, led) ->
 
     update = ->
       request
-        .get(targetUrl)
+        .get(options.url)
         .auth(options.user, options.password)
         .end (err, res) ->
-          return if err?
+          return console.error err if err?
 
-          currentState = res.body.color
+          xml2js.parseString res.text, (err, feed) ->
+            return console.error err if err?
+            currentState = parseProjectStatus feed, options.project
+            return if currentState == lastState
           
-          return if currentState == lastState
+            lastState = currentState
           
-          lastState = currentState
+            process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+            process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
           
-          process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-          process.stdout.write "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+            process.stdout.write "Status: "
           
-          process.stdout.write "Status: "
-          
-          switch currentState
-            when 'red_anime', 'yellow_anime', 'blue_anime', 'grey_anime', 'disabled_anime', 'aborted_anime', 'notbuilt_anime'
-              led.applyPattern patterns.HueMarquee, {}
-              process.stdout.write "In progress..."
-            when 'red'
-              led.applyPattern patterns.Constant, 
-                color: [255, 0, 0]
-              process.stdout.write "Failed"
-            when 'yellow'
-              led.applyPattern patterns.Constant,
-                color: [128, 0, 128]
-              process.stdout.write "Unstable"
-            when 'blue'
-              led.applyPattern patterns.Constant,
-                color: [0, 255, 0]
-              process.stdout.write "Passed"
-            when 'grey', 'disabled', 'aborted',' notbuilt'
-              led.applyPattern patterns.Blink, 
-                color: [64, 64, 64]
-                duration: 2000
-                portion: 0.7
-              process.stdout.write "No Result"  
+            switch currentState
+              when 'Building'
+                led.applyPattern patterns.HueMarquee, {}
+                process.stdout.write "In progress..."
+              when 'Failure'
+                led.applyPattern patterns.Constant, 
+                  color: [255, 0, 0]
+                process.stdout.write "Failed"
+              when 'yellow'
+                led.applyPattern patterns.Constant,
+                  color: [128, 0, 128]
+                process.stdout.write "Unstable"
+              when 'Success'
+                led.applyPattern patterns.Constant,
+                  color: [0, 255, 0]
+                process.stdout.write "Passed"
+              when 'Exception'
+                led.applyPattern patterns.Blink,
+                  color: [255, 0, 0]
+                  duration: 500
+                  porition: 0.7
+              else # 'Pending', 'Unknown'
+                led.applyPattern patterns.Blink, 
+                  color: [64, 64, 64]
+                  duration: 2000
+                  portion: 0.7
+                process.stdout.write "No Result"  
 
     setInterval update, options.interval 
 
