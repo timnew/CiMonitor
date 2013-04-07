@@ -70,6 +70,12 @@ parseProjectStatus = (feed, projectName) ->
 LedLamp.findOrSetByName options.port, (err, led) ->
   return console.error err if err?
   
+  process.stdin.resume()
+  process.on 'SIGINT', ->
+    console.log 'Exiting...'
+    led.port.close (err)->
+      process.exit(if err? then 1 else 0)
+  
   console.log "Connecting to port #{led.portName}..."
   led.ready ->
     console.log "LED Connected"
