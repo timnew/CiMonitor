@@ -2,22 +2,20 @@
 #include "BlueToothSerial.h"
 
 #define BLUETOOTH true
-#define RGBLED
+//#define RGBLED
+#define RBGLED
 
 #define RedPin 11
 #define GreenPin 10
 #define BluePin 9
 
-#ifdef RGBLED
+#if defined RGBLED
 RGBLed led(RedPin, GreenPin, BluePin);
-#endif
-#ifdef RBGLED
+#elif defined RBGLED
 RGBLed led(RedPin, BluePin, GreenPin);
 #endif
 
-#if BLUETOOTH
 BlueToothSerial BTSerial = BlueToothSerial(2, &Serial);
-#endif
 
 void setup() {
   led.setColor(0, 0, 0);

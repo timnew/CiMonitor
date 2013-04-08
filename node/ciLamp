@@ -83,12 +83,13 @@ LedLamp.findOrSetByName options.port, (err, led) ->
     lastState = null
 
     update = ->
-      request
-        .get(options.url)
-        .auth(options.user, options.password)
-        .end (err, res) ->
+      r = request.get(options.url)
+      
+      if options.user?  
+        r.auth(options.user, options.password)
+        
+      r.end (err, res) ->
           return console.error err if err?
-
           xml2js.parseString res.text, (err, feed) ->
             return console.error err if err?
             currentState = parseProjectStatus feed, options.project
