@@ -5,7 +5,7 @@ colorConvert = require('color-convert')
 util = require('util')
 
 options = require('optimist')
-    .usage('Turn off the LED.\nUsage: ledoff [options]\n$0')
+    .usage('Turn off the LED.\nUsage: #{path.basename(process.execPath)} [options]\n$0')
     .options 'p'
       alias: 'port'
       default: null

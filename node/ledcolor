@@ -5,7 +5,7 @@ colorConvert = require('color-convert')
 util = require('util')
 
 options = require('optimist')
-    .usage('Set the LED light.\nUsage: LedControl [options] r/h g/s b/v/l\n$0')
+    .usage("Set the LED light.\nUsage: #{require('path').basename(process.execPath)} [options] r/h g/s b/v/l\n$0")
     .options 'P',
       alias: 'profile'
       default: 'rgb'

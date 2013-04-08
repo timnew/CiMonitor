@@ -12,5 +12,5 @@
 *.la
 *.a
 
-jenkins.json
+*.json
 ci_test

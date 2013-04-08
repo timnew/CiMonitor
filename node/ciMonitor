@@ -9,7 +9,7 @@ _ = require('lodash')
 xml2js = require('xml2js')
 
 argv = require('optimist')
-  .usage('Cycle LED light color in Hue.\nUsage: ciLamp [options] <url>\n$0')
+  .usage('Cycle LED light color in Hue.\nUsage: #{path.basename(process.execPath)} [options] <url>\n$0')
   .options 'u'
     alias: 'url'
     default: null

@@ -4,7 +4,7 @@ LedLamp = require('./PatternedLedLamp')
 HueMarquee = require('./LedPatterns/HueMarquee')
 
 options = require('optimist')
-    .usage('Cycle LED light color in Hue.\nUsage: colorCycle [options]\n$0')
+    .usage("Cycle LED light color in Hue.\nUsage: #{require('path').basename(process.execPath)} [options]\n$0")
     .options 'p'
       alias: 'port'
       default: null
