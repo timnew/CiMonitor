@@ -1,7 +1,9 @@
 #include "RGBLed.h"
 #include "BlueToothSerial.h"
 
-#define BLUETOOTH true
+//#define BLUETOOTH 
+#define IRREMOTE
+
 //#define RGBLED
 #define RBGLED
 
@@ -15,7 +17,24 @@ RGBLed led(RedPin, GreenPin, BluePin);
 RGBLed led(RedPin, BluePin, GreenPin);
 #endif
 
+#ifdef IRREMOTE
+#include <IRremote.h>
+#endif
+
 BlueToothSerial BTSerial = BlueToothSerial(2, &Serial);
+
+#ifdef IRREMOTE
+IRsend irsend;
+
+void sendCode() {
+  unsigned long codeValue;
+  int codeLen;
+  BTSerial.readBytes((char*)&codeValue, 4);
+  BTSerial.readBytes((char*)&codeLen, 2);
+  irsend.sendNEC(codeValue, codeLen);
+}
+
+#endif
 
 void setup() {
   led.setColor(0, 0, 0);
@@ -24,7 +43,7 @@ void setup() {
   
   bool succeeded = true;
   
-#if BLUETOOTH  
+#ifdef BLUETOOTH  
   BTSerial.beginSetup(3);
  
   if(BTSerial.setupEcho(6)) { // Bluetooth board if found
@@ -42,7 +61,6 @@ void setup() {
   String result = BTSerial.endSetup();
   
   BTSerial.println(result);
-  
 #endif
 
   if(succeeded) {
@@ -51,10 +69,7 @@ void setup() {
   else {
     led.blink(0x0000FFL, 4);
   }
-  
-  
-  
-  
+
   BTSerial.println("LED+Ready");
 }
 
@@ -79,10 +94,17 @@ void loop() {
       BTSerial.print(values[2], DEC);
       BTSerial.println("]");
     }
+
+#ifdef IRREMOTE
+    else if(command == "LED+IR") {
+      sendCode();
+    }
+#endif
     else {
       BTSerial.print("Unknown command: ");
       BTSerial.println(command);
     }
   }
 }
+
 

@@ -3,6 +3,7 @@
 request = require('superagent')
 LedLamp = require('./PatternedLedLamp')
 patterns = require('./LedPatterns')
+irCommands = require('./irCommands')
 fs = require('fs')
 path = require('path')
 _ = require('lodash')
@@ -104,30 +105,18 @@ LedLamp.findOrSetByName options.port, (err, led) ->
           
             switch currentState
               when 'Building'
-                led.applyPattern patterns.HueMarquee, {}
+                led.setIRCommand irCommands.building
                 process.stdout.write "In progress..."
               when 'Failure'
-                led.applyPattern patterns.Constant, 
-                  color: [255, 0, 0]
+                led.setIRCommand irCommands.failure
                 process.stdout.write "Failed"
-              when 'yellow'
-                led.applyPattern patterns.Constant,
-                  color: [128, 0, 128]
-                process.stdout.write "Unstable"
               when 'Success'
-                led.applyPattern patterns.Constant,
-                  color: [0, 255, 0]
+                led.setIRCommand irCommands.success
                 process.stdout.write "Passed"
               when 'Exception'
-                led.applyPattern patterns.Blink,
-                  color: [255, 0, 0]
-                  duration: 500
-                  porition: 0.7
+                led.setIRCommand irCommands.exception
               else # 'Pending', 'Unknown'
-                led.applyPattern patterns.Blink, 
-                  color: [64, 64, 64]
-                  duration: 2000
-                  portion: 0.7
+                led.setIRCommand irCommands.unknown
                 process.stdout.write "No Result"  
 
     setInterval update, options.interval 

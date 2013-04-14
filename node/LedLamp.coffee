@@ -53,12 +53,16 @@ class LedLamp extends EventEmitter
     @port.write rawData 
     
   close: ->
-    @port.close()
+    @port.close()  
 
   setColorRGB: (rgb) ->
     @sendCommand "LED+Color"
     @sendRaw rgb
-  
+    
+  setIRCommand: (cmd) ->
+    @sendCommand "LED+IR"
+    @sendRaw cmd
+
   setColorHSL: (hsl) ->
     rgb = colorConvert['hsl']['rgb'](hsl)
     @setColorRGB rgb
