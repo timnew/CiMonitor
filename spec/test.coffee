@@ -6,7 +6,7 @@ describe 'ci test', ->
     
   it 'should fail', (done) ->
     callback = ->
-      done('error')
+      done()
       
     setTimeout callback, 1900
       
