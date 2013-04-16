@@ -4,5 +4,10 @@ describe 'ci test', ->
   it 'should pass', ->
     true.should.be.ok
     
-  it 'should fail', ->
-    null.should.be.ok
+  it 'should fail', (done) ->
+    callback = ->
+      done('error')
+      
+    setTimeout callback, 1900
+      
+    
