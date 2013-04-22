@@ -1,7 +1,7 @@
 #include "RGBLed.h"
 #include "BlueToothSerial.h"
 
-#define BLUETOOTH 0
+#define BLUETOOTH 1
 #define RGBLED
 //#define RBGLED
 
@@ -25,7 +25,7 @@ void setup() {
   bool succeeded = true;
   
 #if BLUETOOTH  
-  BTSerial.beginSetup(3);
+  BTSerial.beginSetup(BLUETOOTH);
  
   if(BTSerial.setupEcho(BLUETOOTH)) { // Bluetooth board if found
 
