@@ -6,7 +6,7 @@ util = require('util')
 
 options = require('optimist')
     .usage('Turn off the LED.\nUsage: #{path.basename(process.execPath)} [options]\n$0')
-    .options 'p'
+    .options 'p',
       alias: 'port'
       default: null
       type: 'string'
