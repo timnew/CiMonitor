@@ -1,9 +1,9 @@
-codes = 
-  on:       0xFFE01F
-  off:      0xFF609F
+codes =
+  on: 0xFFE01F
+  off: 0xFF609F
 
   brighter: 0xFFA05F
-  darker:   0xFF20DF
+  darker: 0xFF20DF
 
   flash: 0xFFF00F
   strobe: 0xFFE817
@@ -36,7 +36,9 @@ buildCommand = (code, length) ->
   result.writeUInt32LE(code, 0)
   result.writeUInt16LE(length, 4)
   result
-    
+
+exports.on = buildCommand(codes.on, 32)
+exports.off = buildCommand(codes.off, 32)
 exports.building = buildCommand(codes.fade, 32)
 exports.failure = buildCommand(codes.red, 32)
 exports.success = buildCommand(codes.green, 32)

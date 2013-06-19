@@ -1,0 +1,49 @@
+#!/usr/bin/env coffee
+_ = require('lodash')
+LedLamp = require('./LedLamp')
+irCommands = require('./irCommands')
+util = require('util')
+
+options = require('optimist')
+  .usage("Send IR Command.\nUsage: #{require('path').basename(process.execPath)} [options] \n$0")
+  .options '?'
+    alias: 'list'
+    type: 'boolean'
+    default: false
+    description: 'List all available commands'
+  .options 'c',
+    alias: 'command'
+    default: 'on'
+    type: 'string'
+    description: 'IR command to be sent'
+  .options 'p'
+    alias: 'port'
+    default: null
+    type: 'string'
+    description: 'The name of the port connected to Arduio board, leave empty for auto-detect'
+  .argv
+
+listCommand = ->
+  console.log "Avaliable Commands:"
+  for name, x of irCommands
+    console.log "  #{name}"
+
+  process.exit(0);
+
+listCommand() if options.list
+
+commandData = irCommands[options.command]
+
+unless commandData?
+  console.error "Unknown command \"#{options.command}\""
+  listCommand()
+
+LedLamp.findOrSetByName options.port, (err, led) ->
+  return console.error err if err?
+
+  console.log "Connect to #{led.portName}..."
+
+  led.ready ->
+
+    console.log "Send command: #{options.command} [0x#{commandData.toString('hex')}]"
+    led.setIRCommand commandData
