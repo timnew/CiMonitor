@@ -11,32 +11,32 @@ xml2js = require('xml2js')
 
 argv = require('optimist')
   .usage('Cycle LED light color in Hue.\nUsage: #{path.basename(process.execPath)} [options] <url>\n$0')
-  .options 'u'
+  .options 'u',
     alias: 'url'
     default: null
     type: 'string'
     description: 'The url of cctray feed, e.g. https://jenkins.jenkins-ci.org/cc.xml'
-  .options 'p'
+  .options 'p',
     alias: 'project'
     default: null
     type: 'string'
     description: 'The name of the project need to monitored'
-  .options 'a'
+  .options 'a',
     alias: 'port'
     default: null
     type: 'string'
     description: 'The name of the port connected to Arduio board, leave empty for auto-detect'
-  .options 'i'
+  .options 'i',
     alias: 'interval'
     default: null
     type: 'string'
     description: 'The query interval(ms) (default: 1000ms)'
-  .options 'U'
+  .options 'U',
     alias: 'user'
     default: null
     type: 'string'
     description: 'User to log into CI server'
-  .options 'P'
+  .options 'P',
     alias: 'password'
     default: null
     type: 'string'
@@ -67,6 +67,21 @@ parseProjectStatus = (feed, projectName) ->
     return 'Building'
   else
     return project.$.lastBuildStatus
+    
+parseOverallProjectStatus = (feed, projectList) ->
+  statuses = _.map projectList, (project) ->
+    parseProjectStatus(feed, project)
+    
+  for status in statuses
+    switch status
+      when 'Building', 'Failure', 'Exception', 'Pending', 'Unknown'
+        lastStatus = status
+        return lastStatus
+      when 'Success', 'yellow'
+        lastStatus = status
+        break
+
+  return lastStatus
 
 LedLamp.findOrSetByName options.port, (err, led) ->
   return console.error err if err?
@@ -93,7 +108,7 @@ LedLamp.findOrSetByName options.port, (err, led) ->
           return console.error err if err?
           xml2js.parseString res.text, (err, feed) ->
             return console.error err if err?
-            currentState = parseProjectStatus feed, options.project
+            currentState = parseOverallProjectStatus feed, options.projects
             return if currentState == lastState
           
             lastState = currentState
