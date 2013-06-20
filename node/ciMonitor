@@ -23,7 +23,7 @@ argv = require('optimist')
     description: 'The name of the project need to monitored'
   .options 'a',
     alias: 'port'
-    default: null
+    default: process.env.CI_MONITOR
     type: 'string'
     description: 'The name of the port connected to Arduio board, leave empty for auto-detect'
   .options 'i',

@@ -8,7 +8,7 @@ options = require('optimist')
     .usage('Turn off the LED.\nUsage: #{path.basename(process.execPath)} [options]\n$0')
     .options 'p',
       alias: 'port'
-      default: null
+      default: process.env.CI_MONITOR
       type: 'string'
       description: 'The name of the port connected to Arduio board, leave empty for auto-detect'
     .argv
