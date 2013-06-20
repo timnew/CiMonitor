@@ -109,7 +109,7 @@ LedLamp.findOrSetByName options.port, (err, led) ->
           xml2js.parseString res.text, (err, feed) ->
             return console.error err if err?
             currentState = parseOverallProjectStatus feed, options.projects
-            return if currentState == lastState and currentState != 'Building'
+            return if currentState == lastState == 'Building'
           
             lastState = currentState
           
