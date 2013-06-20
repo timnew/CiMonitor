@@ -6,7 +6,7 @@ util = require('util')
 
 options = require('optimist')
   .usage("Send IR Command.\nUsage: #{require('path').basename(process.execPath)} [options] \n$0")
-  .options '?'
+  .options '?',
     alias: 'list'
     type: 'boolean'
     default: false
@@ -16,7 +16,7 @@ options = require('optimist')
     default: 'on'
     type: 'string'
     description: 'IR command to be sent'
-  .options 'p'
+  .options 'p',
     alias: 'port'
     default: null
     type: 'string'

@@ -11,7 +11,7 @@ options = require('optimist')
       default: 'rgb'
       type: 'string'
       description: 'Color profile: RGB, HSV, HSL...'
-    .options 'p'
+    .options 'p',
       alias: 'port'
       default: null
       type: 'string'
