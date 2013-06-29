@@ -52,9 +52,6 @@ void setup() {
     led.blink(0x0000FFL, 4);
   }
   
-  
-  
-  
   BTSerial.println("LED+Ready");
 }
 
