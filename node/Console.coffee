@@ -1,21 +1,23 @@
 #!/usr/bin/env coffee
 coffee = require('coffee-script')
 
-REPLServer = require('repl').REPLServer
+readline = require('readline')
 
 class Console
   commands: {}
 
   context: {}
 
-  interpret: (input, _, filename, callback) ->
-    # remove the wrapping ()
-    input = input[1..-2]
+  prompt: []
 
+  parseInput: (input) ->
     args = input.split /[\s\n]+/
-    args.pop()
-
     cmd = args.shift()
+
+    [cmd, args]
+
+  interpret: (input, callback) ->
+    [cmd, args] = @parseInput(input)
 
     return callback(null, undefined) if cmd == ''
 
@@ -73,15 +75,40 @@ class Console
 
     @commands[cmd] = wrapper
 
-  start: =>
-    @repl = new REPLServer
-      prompt: '>'
-      ignoreUndefined: true
-      eval: @interpret
+  start: (welcomeMessage = new Date()) ->
+    @interface = readline.createInterface
+      input: process.stdin
+      output: process.stdout
+      completer: @completer
 
-    @context.console = this
-    @repl.context = @context
-    @rli = @repl.rli
+    @interface.on 'line', @onLine
+    @interface.on 'close', @onClose
+
+    @writeOutput(null, welcomeMessage)
+
+  writeOutput: (err, output) =>
+    if err?
+      console.log("ERROR: #{err}")
+    else
+      console.log(output) unless output == undefined
+
+    @interface.resume()
+    @interface.prompt()
+
+  onLine: (input) =>
+    @interface.pause()
+    @interpret(input.trim(), @writeOutput)
+
+  onClose: =>
+    process.exit()
+
+  completer: (input) =>
+    [cmd, args] = @parseInput(input)
+
+    hits = Object.keys(@commands).filter (command) ->
+      command.indexOf(cmd) == 0
+
+    [hits, input]
 
 exports = module.exports = new Console()
 exports.Console = Console

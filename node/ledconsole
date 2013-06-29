@@ -1,5 +1,10 @@
 #!/usr/bin/env coffee
 ledConsole = require('./Console')
+packageInfo = require('./packageInfo')
+require('./commands')
 
-ledConsole.start()
+ledConsole.start """
+Monitor Management Console v#{packageInfo.version}
+#{new Date()}
+"""
 
