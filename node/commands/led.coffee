@@ -1,4 +1,5 @@
-Led = require('../legacy/LedLamp')
+Led = require('../legacy/PatternedLedLamp')
+patterns = require('../legacy/LedPatterns')
 console = require('../Console')
 util = require('util')
 _ = require('lodash')
@@ -32,3 +33,14 @@ console.setup ->
         callback("Unknown Error #{util.inspect(ledStatus)}")
 
     led.turnOff()
+
+  @syncCmd 'marquee', ['int', 'int', 'int', 'int'], (callback, hue, saturation, value, step) ->
+    led = console.context.led
+
+    led.applyPattern patterns.HueMarquee,
+      hue: hue
+      saturation: saturation
+      value: value
+      step: step
+
+
