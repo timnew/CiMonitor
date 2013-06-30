@@ -8,7 +8,7 @@ class Console
 
   context: {}
 
-  prompt: []
+  promptParts: []
 
   parseInput: (input) ->
     args = input.split /[\s\n]+/
@@ -28,19 +28,19 @@ class Console
 
   converters:
     int: (value) ->
-      parseInt(value, 10)
+      parseInt(value, 10) unless value == undefined
     float: (value) ->
-      parseFloat(value)
+      parseFloat(value) unless value == undefined
     number: (value) ->
-      Number(value)
+      Number(value) unless value == undefined
     bool: (value) ->
-      Boolean(value)
+      Boolean(value) unless value == undefined
     json: (value) ->
-      JSON.parse(value)
+      JSON.parse(value) unless value == undefined
     base64: (value) ->
-      new Buffer(value, 'base64')
+      new Buffer(value, 'base64') unless value == undefined
     hex: (value) ->
-      new Buffer(value, 'hex')
+      new Buffer(value, 'hex') unless value == undefined
 
   convertArgs: (argDefs, args) ->
     for index in [0..args.length - 1]
@@ -50,10 +50,14 @@ class Console
       else
         args[index]
 
-  newArgConverter: (name, converter) ->
+  newArgConverter: (name, converter) =>
     @converters[name] = converter
 
-  addSyncCmd: (cmd, argDefs, action) ->
+  addSyncCmd: (cmd, argDefs, action) =>
+    unless action?
+      action = argDefs
+      argDefs = []
+
     wrapper = (context, rawArgs, callback) =>
       try
         args = @convertArgs(argDefs, rawArgs)
@@ -64,7 +68,11 @@ class Console
 
     @commands[cmd] = wrapper
 
-  addAsyncCmd = (cmd, argDefs, action) ->
+  addAsyncCmd: (cmd, argDefs, action) =>
+    unless action?
+      action = argDefs
+      argDefs = []
+
     wrapper = (context, rawArgs, callback) =>
       try
         args = @convertArgs(argDefs, rawArgs)
@@ -75,6 +83,14 @@ class Console
 
     @commands[cmd] = wrapper
 
+  setup: (block) ->
+    DSL =
+      syncCmd: @addSyncCmd
+      asyncCmd: @addAsyncCmd
+      converter: @newArgConverter
+
+    block.call(DSL)
+
   start: (welcomeMessage = new Date()) ->
     @interface = readline.createInterface
       input: process.stdin
@@ -83,6 +99,8 @@ class Console
 
     @interface.on 'line', @onLine
     @interface.on 'close', @onClose
+
+    @refreshPrompt()
 
     @writeOutput(null, welcomeMessage)
 
@@ -109,6 +127,18 @@ class Console
       command.indexOf(cmd) == 0
 
     [hits, input]
+
+  pushPrompt: (promptPart) ->
+    @promptParts.push promptPart
+    @refreshPrompt()
+
+  popPrompt: ->
+    @promptParts.pop()
+    @refreshPrompt()
+
+  refreshPrompt: ->
+    prompt = @promptParts.join(':') + "> "
+    @interface.setPrompt(prompt, prompt.length)
 
 exports = module.exports = new Console()
 exports.Console = Console
