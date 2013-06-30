@@ -1,4 +1,4 @@
-Led = require('../LedLamp')
+Led = require('../legacy/LedLamp')
 console = require('../Console')
 
 console.setup ->
