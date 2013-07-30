@@ -1,0 +1,6 @@
+desc 'Build application'
+task :build do
+  sh 'coffee -w -o js -c coffee &'
+  sh 'jade -w -P -O html jade &'
+  sh 'stylus -w -o css stylus &'
+end

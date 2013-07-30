@@ -1,0 +1,14 @@
+<Projects>
+  <Project webUrl="http://localhost:8080/job/HHT-Android-Build/" name="HHT-Android-Build" lastBuildLabel="369"
+           lastBuildTime="2013-07-29T17:24:08Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="http://localhost:8080/job/HHT-Android-Deploy/" name="HHT-Android-Deploy" lastBuildLabel="313"
+           lastBuildTime="2013-07-29T17:29:29Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="http://localhost:8080/job/HHT-Android-FunctionalTest/" name="HHT-Android-FunctionalTest"
+           lastBuildLabel="313" lastBuildTime="2013-07-29T17:29:14Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="http://localhost:8080/job/HHT-Android-UnitTest/" name="HHT-Android-UnitTest" lastBuildLabel="385"
+           lastBuildTime="2013-07-29T17:25:31Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="http://localhost:8080/job/HHT-Database/" name="HHT-Database" lastBuildLabel="13"
+           lastBuildTime="2013-07-26T12:49:08Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="http://localhost:8080/job/HHT-Tool/" name="HHT-Tool" lastBuildLabel="4"
+           lastBuildTime="2013-07-17T14:50:58Z" lastBuildStatus="Success" activity="Sleeping"/>
+</Projects>

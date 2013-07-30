@@ -15,3 +15,10 @@
 *.json
 ci_test
 IR_node
+
+bower_components
+chrome/js
+chrome/html
+chrome/css
+
+

@@ -1,0 +1,15 @@
+extend layout
+
+block append css
+  link(href="/css/index.css", rel="stylesheet", type="text/css", media="all")
+
+block append js
+  script(src="/bower_components/jquery/jquery.js")
+  script(src="/js/ProjectInfo.js")
+  script(src="/js/ProjectStatusController.js")
+
+block content
+  ul.project-list(ng-controller="ProjectStatusController")
+    li(ng-repeat="projectInfo in projectInfos")
+      span {{projectInfo.name}}
+      span {{projectInfo.buildNumber}}

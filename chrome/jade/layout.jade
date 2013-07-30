@@ -1,0 +1,9 @@
+!!! 5
+html(ng-app, ng-csp)
+  head
+    block css
+    block js-head
+  body
+    block content
+    block js
+      script(type="text/javascript", src="/bower_components/angular/angular.js")
