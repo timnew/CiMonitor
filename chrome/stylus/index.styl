@@ -8,16 +8,45 @@ ul.project-list
   margin 0
   padding 0
 
-  & > li
+  >li
     display block
     margin 5px
     padding 5px
     border-radius 5px 5px
-    background green
     font-size large
     text-align center
-    height 33%
+    vertical-align middle
     color white
 
     & > span
       margin 5px
+
+.overall-status
+  margin 5px
+  padding 20px 5px
+  border-radius 5px 5px
+  font-size large
+  text-align center
+  vertical-align middle
+  color white
+
+.project
+  background gray
+
+  &[status=building]
+   background yellow
+
+  &[status=success]
+    background green
+
+  &[status=failure]
+    background red
+
+  &[status=exception]
+    background gray
+
+  &[status=pending]
+    background gray
+
+  &[status=unknown]
+    background gray

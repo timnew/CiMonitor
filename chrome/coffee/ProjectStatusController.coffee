@@ -1,9 +1,13 @@
 class @ProjectStatusController
   constructor: ($scope) ->
-    monitor = new StatusMonitor '/cc.xml', 1000, (err, projectInfos) ->
-      return $scope.projectInfos = [] if err?
+    $scope.ledControl = new LedControl()
 
-      $scope.projectInfos = projectInfos
+    monitor = new StatusMonitor '/cc.xml', 1000, (err, projectInfos) ->
+      $scope.projectInfos = if err? then [] else projectInfos
+      $scope.overallStatus = ProjectInfo.getOverallStatus(projectInfos)
+
+      $scope.ledControl.update $scope.overallStatus
+
       $scope.$apply()
 
     monitor.refresh()

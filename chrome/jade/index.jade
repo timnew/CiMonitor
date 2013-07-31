@@ -9,7 +9,9 @@ block append js
   script(src="/js/ProjectStatusController.js")
 
 block content
-  ul.project-list(ng-controller="ProjectStatusController")
-    li(ng-repeat="projectInfo in projectInfos")
-      span {{projectInfo.name}}
-      span {{projectInfo.buildNumber}}
+  div(ng-controller="ProjectStatusController")
+    .project.overall-status(status="{{ overallStatus }}") Overall Status
+    ul.project-list
+      li.project(ng-repeat="projectInfo in projectInfos", status="{{projectInfo.status}}")
+        span {{projectInfo.name}}
+        span {{projectInfo.buildNumber}}
