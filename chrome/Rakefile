@@ -1,6 +1,8 @@
+current_path = File.dirname(__FILE__)
+
 desc 'Build application'
 task :build do
-  sh 'coffee -w -o js -c coffee &'
-  sh 'jade -w -P -O html jade &'
-  sh 'stylus -w -o css stylus &'
+  sh "coffee -w -o js -c #{current_path}/coffee &"
+  sh "jade -w -P -o html #{current_path}/jade &"
+  sh "stylus -w -o css #{current_path}/stylus &"
 end
