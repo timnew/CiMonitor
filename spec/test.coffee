@@ -9,6 +9,6 @@ describe 'ci test', ->
       # false.should.be.ok      
       done()
       
-    setTimeout callback, 20000
+    setTimeout callback, 1500
       
     
