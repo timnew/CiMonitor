@@ -1,9 +1,9 @@
 #include "RGBLed.h"
 #include "BlueToothSerial.h"
 
-#define BLUETOOTH 0
-//#define RGBLED
-#define RBGLED
+#define BLUETOOTH 1
+#define RGBLED
+// #define RBGLED
 
 #define RedPin 11
 #define GreenPin 10

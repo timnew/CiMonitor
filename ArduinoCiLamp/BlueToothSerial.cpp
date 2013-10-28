@@ -51,7 +51,7 @@ void BlueToothSerial::setupPrintln(String label, String value) {
 void BlueToothSerial::setupPrintln(String label, int index, String value) {
   setupPrint(label);
   setupPrint("[");
-  setupPrint(String(index, DEC));
+  setupPrint(String(index, (byte)DEC));
   setupPrint("]: ");
   setupPrint(value);
   setupPrintln();
@@ -65,8 +65,8 @@ String BlueToothSerial::endSetup() {
 }
 
 boolean BlueToothSerial::setupEcho(sbyte retryTimes) { return sendCommand("AT", retryTimes); }
-boolean BlueToothSerial::setupBaund(int baund, sbyte retryTimes) { return sendCommand("AT+UART=" + String(baund, DEC) + ",0,0", retryTimes); }
-boolean BlueToothSerial::setupRole(byte role, sbyte retryTimes) { return sendCommand("AT+ROLE=" + String(role, DEC), retryTimes); }
+boolean BlueToothSerial::setupBaund(int baund, sbyte retryTimes) { return sendCommand("AT+UART=" + String(baund, (byte)DEC) + ",0,0", retryTimes); }
+boolean BlueToothSerial::setupRole(byte role, sbyte retryTimes) { return sendCommand("AT+ROLE=" + String(role, (byte)DEC), retryTimes); }
 boolean BlueToothSerial::setupName(String name, sbyte retryTimes) { return sendCommand("AT+NAME=" + String(name), retryTimes); }
 boolean BlueToothSerial::setupSecret(String secretPin, sbyte retryTimes) { return sendCommand("AT+PSWD=" + String(secretPin), retryTimes); }
 boolean BlueToothSerial::setupRemoveParis(sbyte retryTimes) { return sendCommand("AT+RMAAD", retryTimes); }

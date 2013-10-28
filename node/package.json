@@ -26,11 +26,11 @@
   "license": "MIT",
   "dependencies": {
     "serialport": "git://github.com/voodootikigod/node-serialport.git",
-    "lodash": "1.0.1",
-    "color-convert": "0.3.1",
-    "superagent": "0.13.0",
-    "optimist": "0.3.5",
-    "xml2js": "0.2.6"
+    "lodash": "",
+    "color-convert": "",
+    "superagent": "",
+    "optimist": "*",
+    "xml2js": "*"
   }
 }
 
