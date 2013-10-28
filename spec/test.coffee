@@ -6,9 +6,9 @@ describe 'ci test', ->
     
   it 'should fail', (done) ->
     callback = ->
-      # false.should.be.ok
+      false.should.be.ok      
       done()
       
-    setTimeout callback, 1900
+    setTimeout callback, 20000
       
     
