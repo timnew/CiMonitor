@@ -18,7 +18,8 @@ RGBLed led(RedPin, BluePin, GreenPin);
 #endif
 
 #ifdef IRREMOTE
-#include <IRremote.h>
+#include "IRremote.h"
+#include "IRremoteInt.h"
 #endif
 
 BlueToothSerial BTSerial = BlueToothSerial(2, &Serial);
